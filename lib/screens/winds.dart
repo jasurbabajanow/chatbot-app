@@ -5,7 +5,7 @@ import 'package:gemini_app/services/services.dart';
 class Song extends StatefulWidget {
   final String title;
   final String ans;
-  Song({super.key, required this.title, required this.ans});
+  const Song({super.key, required this.title, required this.ans});
 
   @override
   State<Song> createState() => _SongState();
@@ -24,7 +24,7 @@ class _SongState extends State<Song> with SingleTickerProviderStateMixin {
     service.initTTS();
 
     _controller = AnimationController(
-      duration: Duration(milliseconds: 600),
+      duration: const Duration(milliseconds: 600),
       vsync: this,
     );
 
@@ -47,71 +47,89 @@ class _SongState extends State<Song> with SingleTickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
-    final screenWidth = MediaQuery.of(context).size.width;
-    final screenHeight = MediaQuery.of(context).size.height;
-
     return Scaffold(
-      backgroundColor: Colors.black,
+      extendBodyBehindAppBar: true,
       appBar: AppBar(
-        backgroundColor: Colors.black,
+        backgroundColor: Colors.transparent,
+        elevation: 0,
         automaticallyImplyLeading: false,
-        title: Center(
-          child: Row(
-            children: [
-              IconButton(
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-                icon: Icon(CupertinoIcons.back),
-                iconSize: 30,
-                color: Colors.white,
-                splashColor: Colors.white,
-                highlightColor: Colors.white.withOpacity(0.2),
+        title: Row(
+          children: [
+            Container(
+              decoration: BoxDecoration(
+                color: Colors.white.withOpacity(0.1),
+                shape: BoxShape.circle,
               ),
-              SizedBox(width: 12),
-              Text(
+              child: IconButton(
+                onPressed: () => Navigator.pop(context),
+                icon: const Icon(CupertinoIcons.back),
+                color: Colors.white,
+                iconSize: 24,
+              ),
+            ),
+            const SizedBox(width: 16),
+            Expanded(
+              child: Text(
                 widget.title.toUpperCase(),
-                style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                  fontWeight: FontWeight.bold,
+                overflow: TextOverflow.ellipsis,
+                style: const TextStyle(
+                  fontWeight: FontWeight.w900,
+                  fontSize: 22,
                   color: Colors.white,
+                  letterSpacing: 1,
+                  fontFamily: 'Raleway',
                 ),
               ),
+            ),
+          ],
+        ),
+      ),
+      body: Container(
+        width: double.infinity,
+        height: double.infinity,
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [
+              Color(0xFF0F0C29),
+              Color(0xFF302B63),
+              Color(0xFF24243E),
             ],
           ),
         ),
-      ),
-      body: SafeArea(
-        child: SingleChildScrollView(
-          child: Padding(
-            padding: const EdgeInsets.all(10.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                SizedBox(height: 20),
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
+        child: SafeArea(
+          child: Column(
+            children: [
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
                   child: FadeTransition(
                     opacity: _fadeInAnimation,
                     child: ScaleTransition(
                       scale: _scaleAnimation,
                       child: Container(
-                        width: screenWidth - 20,
-                        height: screenHeight * 0.7,
+                        width: double.infinity,
                         decoration: BoxDecoration(
-                          border: Border.all(width: 1, color: Colors.grey),
-                          borderRadius: BorderRadius.circular(12),
-                          color: Colors.grey[900],
+                          color: Colors.white.withOpacity(0.05),
+                          borderRadius: BorderRadius.circular(30),
+                          border: Border.all(
+                            color: Colors.white.withOpacity(0.1),
+                            width: 1,
+                          ),
                         ),
-                        child: Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Center(
-                            child: SingleChildScrollView(
-                              child: Text(
-                                widget.ans,
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 18,
-                                ),
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(30),
+                          child: SingleChildScrollView(
+                            padding: const EdgeInsets.all(24.0),
+                            child: Text(
+                              widget.ans,
+                              style: TextStyle(
+                                color: Colors.white.withOpacity(0.9),
+                                fontSize: 18,
+                                height: 1.6,
+                                letterSpacing: 0.5,
+                                fontFamily: 'Raleway',
                               ),
                             ),
                           ),
@@ -120,46 +138,50 @@ class _SongState extends State<Song> with SingleTickerProviderStateMixin {
                     ),
                   ),
                 ),
-                SizedBox(height: 20),
-                Center(
-                  child: Container(
+              ),
+              Padding(
+                padding: const EdgeInsets.all(32.0),
+                child: GestureDetector(
+                  onTap: () async {
+                    if (start) {
+                      await service.flutterTts.speak(widget.ans);
+                      setState(() => start = false);
+                    } else {
+                      await service.flutterTts.stop();
+                      setState(() => start = true);
+                    }
+                  },
+                  child: AnimatedContainer(
+                    duration: const Duration(milliseconds: 300),
+                    padding: const EdgeInsets.all(20),
                     decoration: BoxDecoration(
-                      color: Colors.red[700],
+                      gradient: LinearGradient(
+                        colors: start
+                            ? [const Color(0xFFFF8C00), const Color(0xFFFF4500)]
+                            : [Colors.redAccent, Colors.red.shade900],
+                      ),
                       shape: BoxShape.circle,
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.red.withOpacity(0.6),
-                          spreadRadius: 4,
-                          blurRadius: 10,
-                          offset: Offset(0, 4),
+                          color: (start ? Colors.orange : Colors.red)
+                              .withOpacity(0.4),
+                          blurRadius: 25,
+                          spreadRadius: 2,
+                          offset: const Offset(0, 10),
                         ),
                       ],
                     ),
-                    child: IconButton(
-                      onPressed: () async {
-                        if (start) {
-                          await service.flutterTts.speak(widget.ans);
-                          setState(() {
-                            start = false;
-                          });
-                        } else {
-                          await service.flutterTts.stop();
-                          setState(() {
-                            start = true;
-                          });
-                        }
-                      },
-                      icon: Icon(Icons.speaker_phone),
-                      iconSize: 30,
+                    child: Icon(
+                      start
+                          ? CupertinoIcons.play_fill
+                          : CupertinoIcons.stop_fill,
                       color: Colors.white,
-                      padding: const EdgeInsets.all(16.0),
-                      splashColor: Colors.white,
-                      highlightColor: Colors.white.withOpacity(0.2),
+                      size: 32,
                     ),
                   ),
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
         ),
       ),

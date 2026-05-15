@@ -27,7 +27,8 @@ class _MyGensState extends State<MyGens> {
   }
 
   Future<void> _fetchGeneratedContents() async {
-    List<DocumentSnapshot> contents = await _firebaseService.getGeneratedContents();
+    List<DocumentSnapshot> contents =
+        await _firebaseService.getGeneratedContents();
     setState(() {
       _generatedContents = contents;
       _isLoading = false;
@@ -37,97 +38,155 @@ class _MyGensState extends State<MyGens> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.black,
-      body: _isLoading
-          ? SafeArea(child: Center(child: CircularProgressIndicator()))
-          : SafeArea(
-        child: RefreshIndicator(
-          onRefresh: _fetchGeneratedContents, // Trigger data refresh on pull
-          child: SingleChildScrollView(
-            physics: const AlwaysScrollableScrollPhysics(), // Ensure the list can always be pulled down
-            child: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Column(
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    children: [
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Welcome, ',
-                            style: TextStyle(
-                              fontSize: 22,
-                              color: Colors.white,
-                            ),
-                          ),
-                          Text(
-                            '${user?.displayName ?? 'Guest'}',
-                            style: TextStyle(
-                              fontSize: 34,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white,
-                              fontFamily: 'Raleway',
-                            ),
-                          ),
-                        ],
-                      ),
-                      IconButton(
-                        onPressed: () {
-                          FirebaseAuth.instance.signOut();
-                          Navigator.pushReplacement(
-                            context,
-                            MaterialPageRoute(builder: (context) => LoginPage()),
-                          );
-                        },
-                        icon: Icon(
-                          CupertinoIcons.square_arrow_right,
-                          color: Colors.redAccent,
-                        ),
-                        iconSize: 34,
-                      ),
-                    ],
-                  ),
-                  SizedBox(height: 32),
-                  Divider(thickness: 5),
-                  SizedBox(height: 32),
-                  Text(
-                    'Recent Gens',
-                    style: TextStyle(
-                      fontSize: 32,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                    ),
-                  ),
-                  SizedBox(height: 32),
-                  _generatedContents.isEmpty
-                      ? NoGens()
-                      : ListView.builder(
-                    shrinkWrap: true,
-                    physics: NeverScrollableScrollPhysics(),
-                    itemCount: _generatedContents.length,
-                    itemBuilder: (context, index) {
-                      DocumentSnapshot doc = _generatedContents[index];
-                      final email = doc['email'] as String?;
-                      final currentUserEmail = _firebaseService.getCurrentUser()?.email?.toString();
-
-                      if (email == currentUserEmail) {
-                        return CreatedGens(
-                          title: doc['title'] ?? '',
-                          description: doc['description'] ?? '',
-                          content: doc['content'] ?? '',
-                        );
-                      } else {
-                        return SizedBox();
-                      }
-                    },
-                  ),
-                ],
-              ),
-            ),
+      extendBodyBehindAppBar: true,
+      body: Container(
+        width: double.infinity,
+        height: double.infinity,
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [
+              Color(0xFF0F0C29),
+              Color(0xFF302B63),
+              Color(0xFF24243E),
+            ],
           ),
         ),
+        child: _isLoading
+            ? const Center(
+                child: CircularProgressIndicator(color: Colors.orangeAccent))
+            : SafeArea(
+                child: RefreshIndicator(
+                  color: Colors.orangeAccent,
+                  backgroundColor: Color(0xFF302B63),
+                  onRefresh: _fetchGeneratedContents,
+                  child: CustomScrollView(
+                    physics: const AlwaysScrollableScrollPhysics(),
+                    slivers: [
+                      SliverPadding(
+                        padding: const EdgeInsets.fromLTRB(24, 32, 24, 16),
+                        sliver: SliverToBoxAdapter(
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      'Welcome back,',
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                        color: Colors.white.withOpacity(0.6),
+                                        letterSpacing: 1,
+                                      ),
+                                    ),
+                                    Text(
+                                      '${user?.displayName ?? 'Genius'}',
+                                      style: const TextStyle(
+                                        fontSize: 32,
+                                        fontWeight: FontWeight.w900,
+                                        color: Colors.white,
+                                        fontFamily: 'Raleway',
+                                        letterSpacing: -1,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              Container(
+                                decoration: BoxDecoration(
+                                  color: Colors.redAccent.withOpacity(0.1),
+                                  shape: BoxShape.circle,
+                                ),
+                                child: IconButton(
+                                  onPressed: () {
+                                    FirebaseAuth.instance.signOut();
+                                    Navigator.pushReplacement(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) => LoginPage()),
+                                    );
+                                  },
+                                  icon: const Icon(
+                                    CupertinoIcons.power,
+                                    color: Colors.redAccent,
+                                  ),
+                                  iconSize: 28,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                      SliverPadding(
+                        padding: const EdgeInsets.symmetric(horizontal: 24),
+                        sliver: SliverToBoxAdapter(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const SizedBox(height: 40),
+                              Container(
+                                height: 4,
+                                width: 60,
+                                decoration: BoxDecoration(
+                                  gradient: const LinearGradient(
+                                    colors: [Colors.orange, Colors.redAccent],
+                                  ),
+                                  borderRadius: BorderRadius.circular(2),
+                                ),
+                              ),
+                              const SizedBox(height: 12),
+                              const Text(
+                                'Recent Creations',
+                                style: TextStyle(
+                                  fontSize: 28,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white,
+                                  fontFamily: 'Raleway',
+                                ),
+                              ),
+                              const SizedBox(height: 24),
+                            ],
+                          ),
+                        ),
+                      ),
+                      _generatedContents.isEmpty
+                          ? SliverFillRemaining(child: NoGens())
+                          : SliverPadding(
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 16),
+                              sliver: SliverList(
+                                delegate: SliverChildBuilderDelegate(
+                                  (context, index) {
+                                    DocumentSnapshot doc =
+                                        _generatedContents[index];
+                                    final email = doc['email'] as String?;
+                                    final currentUserEmail = _firebaseService
+                                        .getCurrentUser()
+                                        ?.email
+                                        ?.toString();
+
+                                    if (email == currentUserEmail) {
+                                      return CreatedGens(
+                                        title: doc['title'] ?? '',
+                                        description: doc['description'] ?? '',
+                                        content: doc['content'] ?? '',
+                                      );
+                                    } else {
+                                      return const SizedBox();
+                                    }
+                                  },
+                                  childCount: _generatedContents.length,
+                                ),
+                              ),
+                            ),
+                      const SliverToBoxAdapter(child: SizedBox(height: 100)),
+                    ],
+                  ),
+                ),
+              ),
       ),
     );
   }

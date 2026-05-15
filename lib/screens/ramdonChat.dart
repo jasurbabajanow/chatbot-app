@@ -13,7 +13,8 @@ class RandomChat extends StatefulWidget {
   State<RandomChat> createState() => _RandomChatState();
 }
 
-class _RandomChatState extends State<RandomChat> with SingleTickerProviderStateMixin {
+class _RandomChatState extends State<RandomChat>
+    with SingleTickerProviderStateMixin {
   TextEditingController controller = TextEditingController();
   final FirebaseService _firebaseService = FirebaseService();
   final GeminiService _geminiService = GeminiService();
@@ -36,7 +37,9 @@ class _RandomChatState extends State<RandomChat> with SingleTickerProviderStateM
   }
 
   void _loadMessages() {
-    _messagesSubscription = _firebaseService.getChatMessagesStream('chatMessages').listen((snapshot) {
+    _messagesSubscription = _firebaseService
+        .getChatMessagesStream('chatMessages')
+        .listen((snapshot) {
       final newMessages = snapshot.docs;
       final email = _firebaseService.getCurrentUser()?.email.toString();
 
@@ -51,16 +54,16 @@ class _RandomChatState extends State<RandomChat> with SingleTickerProviderStateM
           if (index == -1) {
             // Document is not already in the list, add it
             setState(() {
-              _messages.insert(0, doc); // Insert at the beginning for reversed list
+              _messages.insert(
+                  0, doc); // Insert at the beginning for reversed list
             });
-            _listKey.currentState?.insertItem(0); // Insert at the beginning for reversed list
+            _listKey.currentState
+                ?.insertItem(0); // Insert at the beginning for reversed list
           }
         }
       }
     });
   }
-
-
 
   Future<void> _sendMessage() async {
     if (controller.text.isNotEmpty) {
@@ -74,16 +77,17 @@ class _RandomChatState extends State<RandomChat> with SingleTickerProviderStateM
           'content': controller.text,
           'timestamp': FieldValue.serverTimestamp(),
           'sender': 'user',
-          'email':_firebaseService.getCurrentUser()?.email,
+          'email': _firebaseService.getCurrentUser()?.email,
         });
 
         // Generate response from Gemini
-        final generatedText = await _geminiService.generate('message', controller.text);
+        final generatedText =
+            await _geminiService.generate('message', controller.text);
         await _firebaseService.addChatMessage('chatMessages', {
           'content': generatedText,
           'timestamp': FieldValue.serverTimestamp(),
           'sender': 'ai',
-          'email':_firebaseService.getCurrentUser()?.email,
+          'email': _firebaseService.getCurrentUser()?.email,
         });
 
         controller.clear();
@@ -111,14 +115,14 @@ class _RandomChatState extends State<RandomChat> with SingleTickerProviderStateM
               onPressed: () {
                 Navigator.pop(context);
               },
-              icon: Icon(CupertinoIcons.back),
+              icon: const Icon(CupertinoIcons.back),
               iconSize: 30,
               color: Colors.white,
               splashColor: Colors.white,
               highlightColor: Colors.white.withOpacity(0.2),
             ),
-            SizedBox(width: 12),
-            Text(
+            const SizedBox(width: 12),
+            const Text(
               'Gem AI',
               style: TextStyle(
                 fontWeight: FontWeight.bold,
@@ -141,7 +145,8 @@ class _RandomChatState extends State<RandomChat> with SingleTickerProviderStateM
                 final message = _messages[index];
                 final content = message['content'] ?? '';
                 final timestamp = message['timestamp'] as Timestamp?;
-                final date = timestamp != null ? timestamp.toDate() : DateTime.now();
+                final date =
+                    timestamp != null ? timestamp.toDate() : DateTime.now();
                 final sender = message['sender'] ?? 'unknown';
 
                 return SizeTransition(
@@ -149,9 +154,12 @@ class _RandomChatState extends State<RandomChat> with SingleTickerProviderStateM
                   child: Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: Align(
-                      alignment: sender == 'user' ? Alignment.centerRight : Alignment.centerLeft,
+                      alignment: sender == 'user'
+                          ? Alignment.centerRight
+                          : Alignment.centerLeft,
                       child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 16.0, vertical: 8.0),
                         decoration: BoxDecoration(
                           color: sender == 'user' ? Colors.green : Colors.blue,
                           borderRadius: BorderRadius.circular(12),
@@ -161,12 +169,17 @@ class _RandomChatState extends State<RandomChat> with SingleTickerProviderStateM
                           children: [
                             Text(
                               content,
-                              style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
+                              style: const TextStyle(
+                                  color: Colors.black,
+                                  fontWeight: FontWeight.bold),
                             ),
-                            SizedBox(height: 4),
+                            const SizedBox(height: 4),
                             Text(
                               date.toString(),
-                              style: TextStyle(color: Colors.white, fontSize: 12,fontWeight: FontWeight.bold),
+                              style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.bold),
                             ),
                           ],
                         ),
@@ -184,17 +197,17 @@ class _RandomChatState extends State<RandomChat> with SingleTickerProviderStateM
                 Expanded(
                   child: TextField(
                     controller: controller,
-                    style: TextStyle(color: Colors.white),
+                    style: const TextStyle(color: Colors.white),
                     decoration: InputDecoration(
                       labelText: 'Type a message',
-                      labelStyle: TextStyle(color: Colors.white),
+                      labelStyle: const TextStyle(color: Colors.white),
                       enabledBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(10.0),
-                        borderSide: BorderSide(color: Colors.orange),
+                        borderSide: const BorderSide(color: Colors.orange),
                       ),
                       focusedBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(10.0),
-                        borderSide: BorderSide(color: Colors.orange),
+                        borderSide: const BorderSide(color: Colors.orange),
                       ),
                       fillColor: Colors.black,
                       filled: true,
@@ -202,15 +215,16 @@ class _RandomChatState extends State<RandomChat> with SingleTickerProviderStateM
                   ),
                 ),
                 _isLoading
-                    ? Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: CircularProgressIndicator(), // Show loading indicator
-                )
+                    ? const Padding(
+                        padding: EdgeInsets.all(8.0),
+                        child:
+                            CircularProgressIndicator(), // Show loading indicator
+                      )
                     : IconButton(
-                  onPressed: _sendMessage,
-                  icon: Icon(CupertinoIcons.arrow_right_circle_fill,
-                      color: Colors.orange, size: 56),
-                ),
+                        onPressed: _sendMessage,
+                        icon: const Icon(CupertinoIcons.arrow_right_circle_fill,
+                            color: Colors.orange, size: 56),
+                      ),
               ],
             ),
           ),

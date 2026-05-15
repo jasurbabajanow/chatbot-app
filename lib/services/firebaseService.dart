@@ -1,8 +1,6 @@
-import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:firebase_storage/firebase_storage.dart';
 import 'package:gemini_app/firebase_options.dart';
 
 class FirebaseService {
@@ -11,7 +9,9 @@ class FirebaseService {
   // final FirebaseStorage _storage = FirebaseStorage.instance;
 
   Future<void> initializeFirebase() async {
-    await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform,);
+    await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
+    );
   }
 
   // Authentication methods
@@ -26,10 +26,11 @@ class FirebaseService {
     }
   }
 
-  Future<User?> registerWithEmailPassword(String email, String password, String username) async {
+  Future<User?> registerWithEmailPassword(
+      String email, String password, String username) async {
     try {
-      UserCredential userCredential = await _auth.createUserWithEmailAndPassword(
-          email: email, password: password);
+      UserCredential userCredential = await _auth
+          .createUserWithEmailAndPassword(email: email, password: password);
       User? user = userCredential.user;
 
       if (user != null) {
@@ -68,7 +69,8 @@ class FirebaseService {
     }
   }
 
-  Future<void> updateDocument(String collection, String docId, Map<String, dynamic> data) async {
+  Future<void> updateDocument(
+      String collection, String docId, Map<String, dynamic> data) async {
     try {
       await _firestore.collection(collection).doc(docId).update(data);
     } catch (e) {
@@ -86,7 +88,8 @@ class FirebaseService {
 
   Future<DocumentSnapshot> getDocument(String collection, String docId) async {
     try {
-      DocumentSnapshot doc = await _firestore.collection(collection).doc(docId).get();
+      DocumentSnapshot doc =
+          await _firestore.collection(collection).doc(docId).get();
       return doc;
     } catch (e) {
       print("Error getting document: $e");
@@ -114,10 +117,14 @@ class FirebaseService {
   }
 
   Stream<QuerySnapshot> getChatMessagesStream(String collection) {
-    return _firestore.collection(collection).orderBy('timestamp', descending: true).snapshots();
+    return _firestore
+        .collection(collection)
+        .orderBy('timestamp', descending: true)
+        .snapshots();
   }
 
-  Future<void> addChatMessage(String collection, Map<String, dynamic> data) async {
+  Future<void> addChatMessage(
+      String collection, Map<String, dynamic> data) async {
     try {
       await _firestore.collection(collection).add(data);
     } catch (e) {

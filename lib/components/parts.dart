@@ -8,7 +8,14 @@ class Parts extends StatefulWidget {
   final Color? color1;
   final Color? color2;
 
-  Parts({Key? key, required this.title, required this.icon, this.func,required this.color1,required this.color2}) : super(key: key);
+  Parts(
+      {Key? key,
+      required this.title,
+      required this.icon,
+      this.func,
+      required this.color1,
+      required this.color2})
+      : super(key: key);
 
   @override
   _PartsState createState() => _PartsState();
@@ -31,7 +38,8 @@ class _PartsState extends State<Parts> with SingleTickerProviderStateMixin {
       CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
     );
 
-    _colorAnimation = ColorTween(begin: widget.color1, end: widget.color2).animate(
+    _colorAnimation =
+        ColorTween(begin: widget.color1, end: widget.color2).animate(
       CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
     );
   }
@@ -45,71 +53,104 @@ class _PartsState extends State<Parts> with SingleTickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.all(10.0),
+      padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 12.0),
       child: GestureDetector(
         onTap: () {
           if (widget.func != null) {
             widget.func!();
           }
         },
-        onTapDown: (_) {
-          _controller.forward();
-        },
-        onTapUp: (_) {
-          _controller.reverse();
-        },
-        onTapCancel: () {
-          _controller.reverse();
-        },
+        onPanDown: (_) => _controller.forward(),
+        onPanCancel: () => _controller.reverse(),
+        onPanEnd: (_) => _controller.reverse(),
         child: ScaleTransition(
           scale: _scaleAnimation,
           child: AnimatedBuilder(
             animation: _colorAnimation,
-            builder: (context, child) => AnimatedContainer(
-              duration: Duration(milliseconds: 300),
-              height: 120,
+            builder: (context, child) => Container(
+              height: 100,
               decoration: BoxDecoration(
-                shape: BoxShape.rectangle,
                 borderRadius: BorderRadius.circular(24),
-                color: _colorAnimation.value,
-                border: Border.all(
-                  color: Colors.white,
+                gradient: LinearGradient(
+                  colors: [
+                    _colorAnimation.value ?? Colors.grey,
+                    (_colorAnimation.value ?? Colors.grey).withOpacity(0.8),
+                  ],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
                 ),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.grey.withOpacity(0.5),
-                    spreadRadius: 5,
-                    blurRadius: 7,
-                    offset: Offset(0, 3),
+                    color:
+                        (_colorAnimation.value ?? Colors.grey).withOpacity(0.4),
+                    spreadRadius: 0,
+                    blurRadius: 20,
+                    offset: const Offset(0, 10),
                   ),
                 ],
-              ),
-              child: Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    ScaleTransition(
-                      scale: _scaleAnimation,
-                      child: Text(
-                        widget.title,
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 18,
-                        ),
-                      ),
-                    ),
-                    ScaleTransition(
-                      scale: _scaleAnimation,
-                      child: Icon(
-                        widget.icon,
-                        size: 50,
-                        color: Colors.white,
-                      ),
-                    ),
-                  ],
+                border: Border.all(
+                  color: Colors.white.withOpacity(0.2),
+                  width: 1,
                 ),
+              ),
+              child: Stack(
+                children: [
+                  Positioned(
+                    right: -20,
+                    bottom: -20,
+                    child: Icon(
+                      widget.icon,
+                      size: 100,
+                      color: Colors.white.withOpacity(0.1),
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Expanded(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                widget.title,
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.w900,
+                                  fontSize: 22,
+                                  fontFamily: 'Raleway',
+                                  letterSpacing: -0.5,
+                                ),
+                              ),
+                              const SizedBox(height: 4),
+                              Text(
+                                'Tap to start generating',
+                                style: TextStyle(
+                                  color: Colors.white.withOpacity(0.6),
+                                  fontSize: 12,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        Container(
+                          padding: const EdgeInsets.all(12),
+                          decoration: BoxDecoration(
+                            color: Colors.white.withOpacity(0.2),
+                            shape: BoxShape.circle,
+                          ),
+                          child: Icon(
+                            widget.icon,
+                            size: 28,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
               ),
             ),
           ),

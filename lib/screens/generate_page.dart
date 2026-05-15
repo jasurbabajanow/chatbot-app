@@ -10,7 +10,8 @@ class GeneratePage extends StatefulWidget {
   _GeneratePageState createState() => _GeneratePageState();
 }
 
-class _GeneratePageState extends State<GeneratePage> with SingleTickerProviderStateMixin {
+class _GeneratePageState extends State<GeneratePage>
+    with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<double> _fadeInAnimation;
   late Animation<double> _scaleAnimation;
@@ -20,7 +21,7 @@ class _GeneratePageState extends State<GeneratePage> with SingleTickerProviderSt
     super.initState();
 
     _controller = AnimationController(
-      duration: Duration(milliseconds: 600),
+      duration: const Duration(milliseconds: 600),
       vsync: this,
     );
 
@@ -54,22 +55,20 @@ class _GeneratePageState extends State<GeneratePage> with SingleTickerProviderSt
               onPressed: () {
                 Navigator.pop(context);
               },
-              icon: Icon(CupertinoIcons.back),
+              icon: const Icon(CupertinoIcons.back),
               iconSize: 30,
               color: Colors.white,
               splashColor: Colors.white,
               highlightColor: Colors.white.withOpacity(0.2),
             ),
-            SizedBox(width: 12),
-            Container(
-              child: Text(
-                'Gem AI',
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 32,
-                  color: Colors.white,
-                  fontFamily: 'Raleway',
-                ),
+            const SizedBox(width: 12),
+            const Text(
+              'Chatbot',
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 32,
+                color: Colors.white,
+                fontFamily: 'Raleway',
               ),
             ),
           ],
@@ -92,7 +91,7 @@ class _GeneratePageState extends State<GeneratePage> with SingleTickerProviderSt
                       child: Center(
                         child: Text(
                           '${widget.title} Gen',
-                          style: TextStyle(
+                          style: const TextStyle(
                             color: Colors.white,
                             fontSize: 40,
                             fontFamily: 'Raleway',
@@ -109,7 +108,7 @@ class _GeneratePageState extends State<GeneratePage> with SingleTickerProviderSt
                         height: 200.0,
                         fit: BoxFit.cover,
                         errorBuilder: (context, error, stackTrace) {
-                          return Icon(
+                          return const Icon(
                             Icons.error,
                             color: Colors.red,
                             size: 100.0,

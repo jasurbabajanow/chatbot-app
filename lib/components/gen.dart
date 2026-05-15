@@ -3,7 +3,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import '../screens/winds.dart'; // Replace with the correct path to your Song widget
 import 'package:gemini_app/services/firebaseService.dart'; // Import your FirebaseService
-import 'package:gemini_app/services/geminiService.dart';// Import your GeminiService
+import 'package:gemini_app/services/geminiService.dart'; // Import your GeminiService
 
 class Generate extends StatefulWidget {
   final String title;
@@ -16,8 +16,10 @@ class Generate extends StatefulWidget {
 class _GenerateState extends State<Generate> {
   TextEditingController controller = TextEditingController();
   bool loading = false;
-  final FirebaseService _firebaseService = FirebaseService(); // Initialize FirebaseService
-  final GeminiService _geminiService = GeminiService(); // Initialize GeminiService
+  final FirebaseService _firebaseService =
+      FirebaseService(); // Initialize FirebaseService
+  final GeminiService _geminiService =
+      GeminiService(); // Initialize GeminiService
 
   @override
   void initState() {
@@ -37,7 +39,8 @@ class _GenerateState extends State<Generate> {
       });
 
       // Use GeminiService to generate content
-      generatedContent = await _geminiService.generate(widget.title, controller.text);
+      generatedContent =
+          await _geminiService.generate(widget.title, controller.text);
 
       // Store the generated content in Firestore using FirebaseService
       await _firebaseService.addDocument('generatedContents', {
@@ -45,7 +48,8 @@ class _GenerateState extends State<Generate> {
         'description': controller.text,
         'content': generatedContent,
         'email': _firebaseService.getCurrentUser()?.email,
-        'timestamp': FieldValue.serverTimestamp(), // Add a timestamp for sorting
+        'timestamp':
+            FieldValue.serverTimestamp(), // Add a timestamp for sorting
       });
 
       setState(() {
@@ -55,7 +59,9 @@ class _GenerateState extends State<Generate> {
       // Navigate to the Song screen with the generated content
       Navigator.push(
         context,
-        MaterialPageRoute(builder: (context) => Song(title: controller.text, ans: generatedContent)),
+        MaterialPageRoute(
+            builder: (context) =>
+                Song(title: controller.text, ans: generatedContent)),
       );
     } catch (e) {
       print('Error obtaining Gemini instance or fetching content: $e');
@@ -68,65 +74,99 @@ class _GenerateState extends State<Generate> {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.all(9),
-      child: Row(
+      padding: const EdgeInsets.all(20.0),
+      child: Column(
         children: [
-          Expanded(
+          Container(
+            decoration: BoxDecoration(
+              color: Colors.white.withOpacity(0.05),
+              borderRadius: BorderRadius.circular(20),
+              border: Border.all(
+                color: Colors.white.withOpacity(0.1),
+                width: 1,
+              ),
+            ),
             child: TextField(
-              style: TextStyle(color: Colors.white),
+              style: const TextStyle(color: Colors.white, fontSize: 16),
               controller: controller,
-              // onSubmitted: (value) => _fetchContents(),
+              maxLines: 3,
+              minLines: 1,
               decoration: InputDecoration(
-                labelText: 'Generate',
-                labelStyle: TextStyle(color: Colors.white),
-                enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(10.0),
-                  borderSide: BorderSide(
-                    color: Colors.orange,
-                  ),
+                hintText:
+                    'What should the ${widget.title.toLowerCase()} be about?',
+                hintStyle: TextStyle(color: Colors.white.withOpacity(0.3)),
+                contentPadding: const EdgeInsets.all(20),
+                border: InputBorder.none,
+                prefixIcon: Icon(
+                  widget.title == 'Song'
+                      ? Icons.music_note
+                      : widget.title == 'Story'
+                          ? Icons.book
+                          : Icons.text_fields,
+                  color: Colors.orangeAccent,
                 ),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(10.0),
-                  borderSide: BorderSide(
-                    color: Colors.orange,
-                  ),
-                ),
-                errorBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(10.0),
-                  borderSide: BorderSide(
-                    color: Colors.red,
-                  ),
-                ),
-                focusedErrorBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(10.0),
-                  borderSide: BorderSide(
-                    color: Colors.red,
-                  ),
-                ),
-                fillColor: Colors.black,
-                filled: true,
               ),
             ),
           ),
+          const SizedBox(height: 24),
           loading
-              ? Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: CircularProgressIndicator(), // Show loading indicator
-          )
-              : IconButton(
-            onPressed: () => _fetchContents(),
-            icon: Icon(CupertinoIcons.arrow_right_circle_fill,
-                color: Colors.orange, size: 56),
-          ),
-          loading
-              ? Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: CircularProgressIndicator(), // Show loading indicator
+              ? const Center(
+                  child: Column(
+                    children: [
+                      CircularProgressIndicator(
+                        color: Colors.orangeAccent,
+                        strokeWidth: 3,
+                      ),
+                      SizedBox(height: 16),
+                      Text(
+                        'AI is thinking...',
+                        style: TextStyle(color: Colors.white70, fontSize: 14),
+                      ),
+                    ],
+                  ),
                 )
-              : IconButton(
-                  onPressed: () => _fetchContents(),
-                  icon: Icon(CupertinoIcons.arrow_right_circle_fill,
-                      color: Colors.orange, size: 56),
+              : Container(
+                  width: double.infinity,
+                  height: 60,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(20),
+                    gradient: const LinearGradient(
+                      colors: [Color(0xFFFF8C00), Color(0xFFFF4500)],
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.orange.withOpacity(0.3),
+                        blurRadius: 20,
+                        offset: const Offset(0, 10),
+                      ),
+                    ],
+                  ),
+                  child: ElevatedButton(
+                    onPressed: _fetchContents,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.transparent,
+                      shadowColor: Colors.transparent,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Text(
+                          'Generate Now',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        const Icon(CupertinoIcons.sparkles,
+                            color: Colors.white),
+                      ],
+                    ),
+                  ),
                 ),
         ],
       ),
